@@ -36,7 +36,7 @@ The process of rasterization involves two main steps, or answering two questions
 The answer to the first question would be, in our case, a list of 16 fragment positions, as we observe 16 pixels are covered by this triangle. Perhaps the second question seems absurdly simple to answer: "we should color the pixels with the color of the triangle". However, in reality, triangles can have different colors at each vertex, and the color of a pixel that is covered by a triangle is not always simply the color of the triangle. The color of a pixel is determined by interpolating the colors of the vertices that form the triangle.
 
 Generally, we should assume that the 3 vertices of a triangle have different properties, such as different color. Let's assume that we have defined a triangle such that two vertices are white and one vertex is black. Now the intermetiade colors are not going to be so trivial to compute as in a fully blue triangle. We would like the triangle to have a kind of gradient of shades of gray that smoothly go from white in the two white vertices to black in the black vertex. To achieve this, we will use barycentric interpolation. You can see barycentric interpolation as a way to obtain the color of any point inside a triangle, given the color of the three vertices, their respective positions and the position of the point that we are trying to compute the color for. Intuitively, the closer the point is to a vertex, the more the color of that vertex will contribute to the final color of that point. 
-Now let's assume we already done step 1 of rasterization: we already know which pixels are covered by the triangle. Now, in order to answer "which color should we color each pixel", we will go throgh all pixels that are covered by the triangle.
+Now let's assume we already done step 1 of rasterization: we already know which pixels are covered by the triangle. Now, in order to answer "which color should we color each pixel", we will go through all pixels that are covered by the triangle.
 For each pixel, we know its position in space. Now we can use barycentric interpolation to compute the color of that pixel, given its position and the colors of the three vertices.
 
 ### Vertex shader. 
@@ -67,12 +67,12 @@ void main() {
     gl_FragColor = vec4(interpolated_color, 1.0);
 }
 ```
-Note that we are definying the same variable `varying vec3 interpolated_color` that we defined in the vertex shader. This is how the fragment shader receives the interpolated values from the vertex shader. You need to make sure that the type and name of the varible is the same as you defined it in the vertex shader.
+Note that we are defining the same variable `varying vec3 interpolated_color` that we defined in the vertex shader. This is how the fragment shader receives the interpolated values from the vertex shader. You need to make sure that the type and name of the varible is the same as you defined it in the vertex shader.
 `gl_FragColor` is a special variable that is used to specify the color of the fragment.
 
 
 ### An example: Phong shading
-The Phong shading is characterized by the fact that the color is computed per fragment (pixel). This means that in the Phong shading, we will interpolate the properties that affect the color and compute the color at each fragment. You will learn the detail of how this color is computed, but for now think about it as some function that takes into account the material propertes, the light direction, the surface direcetion, the eye (view) direction to output a color. 
+The Phong shading is characterized by the fact that the color is computed per fragment (pixel). This means that in the Phong shading, we will interpolate the properties that affect the color and compute the color at each fragment. You will learn the detail of how this color is computed, but for now think about it as some function that takes into account the material propertes, the light direction, the surface direction, the eye (view) direction to output a color. 
 Let's define the vertex shader:
 ```javascript
 varying vec3 interpolated_normal;

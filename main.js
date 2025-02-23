@@ -60,13 +60,17 @@ let blendingFactor = 0.1;
 // Create additional variables as needed here
 
 // Starter code sphere, feel free to delete it afterwards
-let geometry = new THREE.SphereGeometry(1, 32, 32);
-let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-let sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
+// let geometry = new THREE.SphereGeometry(1, 32, 32);
+// let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+// let sphere = new THREE.Mesh(geometry, material);
+// scene.add(sphere);
 
 // TODO: Create the sun
-let sun = null;
+let sunGeometry = new THREE.SphereGeometry(1, 32, 32);
+let sunMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+scene.add(sun);
+
 
 // TODO: Create sun light
 let sunLight = null;
@@ -413,8 +417,14 @@ function animate() {
 
     let time = clock.getElapsedTime();
 
-    // TODO: Animate sun radius and color
     let period10 = time % 10.0;
+    let offset = period10 < 5 ? period10 / 5.0 : (10.0 - period10) / 5.0
+    let scale = 1 + 2 * offset;
+    let r = 1.0
+    let g = offset;
+    let b = offset;
+    sun.scale.set(scale, scale, scale);
+    sun.material.color.setRGB(r, g, b);
 
     // TODO: Update sun light
 
