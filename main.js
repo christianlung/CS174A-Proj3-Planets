@@ -135,7 +135,8 @@ planets = [
     { mesh: planet1, distance: 5, speed: 1.0 },
     { mesh: planet2, distance: 8, speed: 5 / 8 },
     { mesh: planet3, distance: 11, speed: 5 / 11 },
-    { mesh: planet4, distance: 14, speed: 5 / 14}
+    { mesh: planet4, distance: 14, speed: 5 / 14},
+    { mesh: moon, distance: 14, speed: 5 / 14}
 ];
 
 // Handle window resize
@@ -506,9 +507,23 @@ function onWindowResize() {
 function onKeyDown(event) {
     switch (event.keyCode) {
         case 48: // '0' key - Detach camera
+            attachedObject = null;
             break;
-        
-        //...
+        case 49: 
+            attachedObject = 0;
+            break;
+        case 50:
+            attachedObject = 1;
+            break;
+        case 51:
+            attachedObject = 2;
+            break;
+        case 52:
+            attachedObject = 3;
+            break;
+        case 53:
+            attachedObject = 'moon';
+            break;
     }
 }
 
@@ -544,7 +559,7 @@ function animate() {
         
         let model_transform = new THREE.Matrix4(); 
         
-        // TODO: Implement the model transformations for the planets
+        // Model transformations for the planets
         let angle = time * speed;
         model_transform.multiply(rotationMatrixY(angle));
         model_transform.multiply(translationMatrix(distance, 0, 0));
@@ -577,10 +592,10 @@ function animate() {
             controls.enabled = false;
         } 
 
-        // TODO: If camera is detached, slowly lerp the camera back to the original position and look at the origin
+        // If camera is detached, slowly lerp the camera back to the original position and look at the origin
         else if (attachedObject === null) {
-
-
+            camera.position.lerp(new THREE.Vector3(0, 10, 20), blendingFactor);
+            camera.lookAt(0, 0, 0);
             // Enable controls
             controls.enabled = true;
         }
@@ -589,7 +604,7 @@ function animate() {
     // Gouraud/Phong shading alternatively to Planet 2
     planet2.material = (Math.floor(time) % 2 === 0) ? planet2Phong : planet2Gourand;
 
-    // TODO: Update customized planet material uniforms
+    // Update customized planet material uniforms
     updatePlanetMaterialUniforms(planets[1].mesh);
     updatePlanetMaterialUniforms(planets[2].mesh);
     updatePlanetMaterialUniforms(planets[3].mesh);
