@@ -59,21 +59,12 @@ let attachedObject = null;
 let blendingFactor = 0.1;
 // Create additional variables as needed here
 
-// Starter code sphere, feel free to delete it afterwards
-// let geometry = new THREE.SphereGeometry(1, 32, 32);
-// let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-// let sphere = new THREE.Mesh(geometry, material);
-// scene.add(sphere);
-
-// TODO: Create the sun
 let sunGeometry = new THREE.SphereGeometry(1, 32, 32);
 let sunMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const sun = new THREE.Mesh(sunGeometry, sunMaterial);
 scene.add(sun);
 
-
-// TODO: Create sun light
-let sunLight = null;
+let sunLight = new THREE.PointLight({ decay: 1 });
 
 // Create orbiting planets
 // TODO: Create Planet 1: Flat-shaded Gray Planet
@@ -426,7 +417,8 @@ function animate() {
     sun.scale.set(scale, scale, scale);
     sun.material.color.setRGB(r, g, b);
 
-    // TODO: Update sun light
+    sunLight.power = 10 ** (0.5 * scale); // 10 ** (radius(t))
+    sunLight.color.setRGB(r, g, b);
 
     // TODO: Loop through all the orbiting planets and apply transformation to create animation effect
     planets.forEach(function (obj, index) {
