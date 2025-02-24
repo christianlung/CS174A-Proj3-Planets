@@ -111,19 +111,31 @@ let ringMaterial = createRingMaterial({ color: 0xB08040 });
 let ring = new THREE.Mesh(ringGeometry, ringMaterial);
 planet3.add(ring);
 
-// TODO: Create Planet 4: Soft Light Blue Planet
-let planet4 = new THREE.SphereGeometry(1, 16, 16);
+// Planet 4: Soft Light Blue Planet
+let planet4Geometry = new THREE.SphereGeometry(1, 16, 16);
+let planet4MaterialProperties = {
+    color: 0x0000D1,
+    ambient: 0.0,
+    diffusivity: 1.0,
+    specularity: 1.0,
+    smoothness: 100.0
+}
+let planet4Material = createPhongMaterial(planet4MaterialProperties);
+let planet4 = new THREE.Mesh(planet4Geometry, planet4Material);
+scene.add(planet4);
 
-// TODO: Create Planet 4's Moon
-let moon = new THREE.SphereGeometry(1, 4, 2);
+// Planet 4's Moon
+let moonGeometry = new THREE.SphereGeometry(1, 4, 2);
+let moonMaterial = new THREE.MeshPhongMaterial({ color: 0xC83CB9, flatShading: true });
+let moon = new THREE.Mesh(moonGeometry, moonMaterial);
+planet4.add(moon);
 
-// TODO: Store planets and moon in an array for easy access, 
-// e.g. { mesh: planet1, distance: 5, speed: 1 },
+// Store planets and moon in an array for easy access, 
 planets = [
     { mesh: planet1, distance: 5, speed: 1.0 },
     { mesh: planet2, distance: 8, speed: 5 / 8 },
     { mesh: planet3, distance: 11, speed: 5 / 11 },
-    // { mesh: planet4, distance: 14, speed: 5 / 14}
+    { mesh: planet4, distance: 14, speed: 5 / 14}
 ];
 
 // Handle window resize
@@ -517,7 +529,14 @@ function animate() {
     sunLight.power = 10 ** scale;
     sunLight.color.setRGB(r, g, b);
 
-    // TODO: Loop through all the orbiting planets and apply transformation to create animation effect
+    let moonOrbitAngle = time; // adjust orbit speed as needed
+    let moonOrbitMatrix = new THREE.Matrix4();
+    moonOrbitMatrix.multiply(rotationMatrixY(moonOrbitAngle));
+    moonOrbitMatrix.multiply(translationMatrix(2.5, 0, 0));
+    moon.matrix.copy(moonOrbitMatrix);
+    moon.matrixAutoUpdate = false;
+
+    // Loop through all the orbiting planets and apply transformation to create animation effect
     planets.forEach(function (obj, index) {
         let planet = obj.mesh
         let distance = obj.distance
@@ -526,8 +545,6 @@ function animate() {
         let model_transform = new THREE.Matrix4(); 
         
         // TODO: Implement the model transformations for the planets
-        // Hint: Some of the planets have the same set of transformation matrices, but for some you have to apply some additional transformation to make it work (e.g. planet4's moon, planet3's wobbling effect(optional)).
-        
         let angle = time * speed;
         model_transform.multiply(rotationMatrixY(angle));
         model_transform.multiply(translationMatrix(distance, 0, 0));
@@ -575,6 +592,7 @@ function animate() {
     // TODO: Update customized planet material uniforms
     updatePlanetMaterialUniforms(planets[1].mesh);
     updatePlanetMaterialUniforms(planets[2].mesh);
+    updatePlanetMaterialUniforms(planets[3].mesh);
     
 
     // Update controls only when the camera is not attached
