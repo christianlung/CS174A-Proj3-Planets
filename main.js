@@ -68,7 +68,7 @@ let sunLight = new THREE.PointLight({ decay: 1 });
 scene.add(sunLight);
 
 // Create orbiting planets
-// Create Planet 1: Flat-shaded Gray Planet
+// Planet 1: Flat-shaded Gray Planet
 let planet1Geometry = new THREE.SphereGeometry(1, 8, 6);
 let planet1Material = new THREE.MeshPhongMaterial({
     color: 0x808080,
@@ -78,7 +78,7 @@ let planet1Material = new THREE.MeshPhongMaterial({
 let planet1 = new THREE.Mesh(planet1Geometry, planet1Material);
 scene.add(planet1);
 
-// TODO: Create Planet 2: Swampy Green-Blue with Dynamic Shading
+// Planet 2: Swampy Green-Blue with Dynamic Shading
 let planet2Geometry = new THREE.SphereGeometry(1, 8, 8);
 let planet2MaterialProperties = {
     color: 0x80FFFF,
@@ -92,10 +92,24 @@ let planet2Gourand = createGouraudMaterial(planet2MaterialProperties);
 let planet2 = new THREE.Mesh(planet2Geometry, planet2Phong);
 scene.add(planet2);
 
-// TODO: Create Planet 3: Muddy Brown-Orange Planet with Ring
-let planet3 = new THREE.SphereGeometry(1, 16, 16);
+// Planet 3: Muddy Brown-Orange Planet with Ring
+let planet3Geometry = new THREE.SphereGeometry(1, 16, 16);
+let planet3MaterialProperties = {
+    color: 0xB08040,
+    ambient: 0.0,
+    diffusivity: 1.0,
+    specularity: 1.0,
+    smoothness: 100.0
+}
+let planet3Material = createPhongMaterial(planet3MaterialProperties);
+let planet3 = new THREE.Mesh(planet3Geometry, planet3Material);
+scene.add(planet3);
+
 // Planet 3 Ring
-let ring = new THREE.RingGeometry(1.5, 2.5, 64);
+let ringGeometry = new THREE.RingGeometry(1.5, 2.5, 64);
+let ringMaterial = createRingMaterial({ color: 0xB08040 });
+let ring = new THREE.Mesh(ringGeometry, ringMaterial);
+planet3.add(ring);
 
 // TODO: Create Planet 4: Soft Light Blue Planet
 let planet4 = new THREE.SphereGeometry(1, 16, 16);
@@ -108,7 +122,7 @@ let moon = new THREE.SphereGeometry(1, 4, 2);
 planets = [
     { mesh: planet1, distance: 5, speed: 1.0 },
     { mesh: planet2, distance: 8, speed: 5 / 8 },
-    // { mesh: planet3, distance: 11, speed: 5 / 11 },
+    { mesh: planet3, distance: 11, speed: 5 / 11 },
     // { mesh: planet4, distance: 14, speed: 5 / 14}
 ];
 
@@ -367,14 +381,21 @@ function createRingMaterial(materialProperties) {
         varying vec3 vPosition;
 
         void main() {
-
+            float r = length(vPosition.xy);
+            float normalizedR = (r-1.5) / (2.5 - 1.5);
+            float brightness = 0.7 + 0.3 * sin(normalizedR * 2.0 * 3.14159 * 5.0);
+            gl_FragColor = vec4(color * brightness, 1.0);
         }
     `;
 
     // TODO: Fill in the values to be passed in to create the custom shader
     return new THREE.ShaderMaterial({
-        uniforms: {color: null},
-
+        uniforms: {
+            color: { value: new THREE.Color(materialProperties.color) }
+        },
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader,
+        side: THREE.DoubleSide
     });
 }
 
@@ -548,12 +569,12 @@ function animate() {
         }
     });
     
-    // TODO: Apply Gouraud/Phong shading alternatively to Planet 2
+    // Gouraud/Phong shading alternatively to Planet 2
     planet2.material = (Math.floor(time) % 2 === 0) ? planet2Phong : planet2Gourand;
-    updatePlanetMaterialUniforms(planet2);
 
     // TODO: Update customized planet material uniforms
-    // e.g. updatePlanetMaterialUniforms(planets[1].mesh);
+    updatePlanetMaterialUniforms(planets[1].mesh);
+    updatePlanetMaterialUniforms(planets[2].mesh);
     
 
     // Update controls only when the camera is not attached
