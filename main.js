@@ -522,7 +522,7 @@ function onKeyDown(event) {
             attachedObject = 3;
             break;
         case 53:
-            attachedObject = 'moon';
+            attachedObject = 4;
             break;
     }
 }
@@ -559,13 +559,15 @@ function animate() {
         
         let model_transform = new THREE.Matrix4(); 
         
-        // Model transformations for the planets
-        let angle = time * speed;
-        model_transform.multiply(rotationMatrixY(angle));
-        model_transform.multiply(translationMatrix(distance, 0, 0));
+        if (index < 4){
+            // Model transformations for the planets
+            let angle = time * speed;
+            model_transform.multiply(rotationMatrixY(angle));
+            model_transform.multiply(translationMatrix(distance, 0, 0));
 
-        planet.matrix.copy(model_transform);
-        planet.matrixAutoUpdate = false;
+            planet.matrix.copy(model_transform);
+            planet.matrixAutoUpdate = false;
+        }
         
         // Camera attachment logic here, when certain planet is being attached, we want the camera to be following the planet by having the same transformation as the planet itself. No need to make changes.
         if (attachedObject === index){
