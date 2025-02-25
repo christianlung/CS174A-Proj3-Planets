@@ -572,9 +572,12 @@ function animate() {
         // Camera attachment logic here, when certain planet is being attached, we want the camera to be following the planet by having the same transformation as the planet itself. No need to make changes.
         if (attachedObject === index){
             let cameraTransform = new THREE.Matrix4();
-
-            // Copy the transformation of the planet (Hint: for the wobbling planet 3, you might have to rewrite to the model_tranform so that the camera won't wobble together)
-            cameraTransform.copy(model_transform);
+            
+            if (attachedObject === 4) {
+                cameraTransform.copy(moon.matrixWorld.clone()); // Copy moon's matrix
+            } else {
+                cameraTransform.copy(model_transform); // Default: follow the planet
+            }
             
             // Add a translation offset of (0, 0, 10) in front of the planet
             let offset = translationMatrix(0, 0, 10);
@@ -585,10 +588,14 @@ function animate() {
             cameraPosition.setFromMatrixPosition(cameraTransform);
             camera.position.lerp(cameraPosition, blendingFactor);
 
-            // Make the camera look at the planet
-            let planetPosition = new THREE.Vector3();
-            planetPosition.setFromMatrixPosition(planet.matrix);
-            camera.lookAt(planetPosition);
+            // Make the camera look at the moon or planet
+            let targetPosition = new THREE.Vector3();
+            if (attachedObject === 4) {
+                targetPosition.setFromMatrixPosition(moon.matrixWorld); // Look at moon
+            } else {
+                targetPosition.setFromMatrixPosition(planet.matrix); // Look at planet
+            }
+            camera.lookAt(targetPosition);
 
             // Disable controls
             controls.enabled = false;
